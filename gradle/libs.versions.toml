@@ -18,6 +18,7 @@ navigationCompose = "2.7.7"
 coroutines = "1.8.0"
 datastore = "1.0.0"
 room = "2.6.1"
+ksp = "1.8.10-1.0.9"
 
 
 [libraries]
@@ -55,5 +56,6 @@ google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compil
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinKapt = { id = "kotlin-kapt" }
+googleKsp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 googleDaggerHilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 
