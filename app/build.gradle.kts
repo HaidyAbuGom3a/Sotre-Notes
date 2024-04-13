@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.googleDaggerHilt)
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
 }
@@ -86,6 +87,7 @@ dependencies {
     implementation(libs.jetbrains.kotlinx.coroutines.android)
     implementation(libs.jetbrains.kotlinx.coroutines.core)
     //room
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     //dataStore
