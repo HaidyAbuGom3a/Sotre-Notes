@@ -12,6 +12,7 @@ storeVersion = "5.1.0-alpha02"
 googleServices = "4.4.1"
 firebaseAuth = "22.3.1"
 firebaseFirestore = "24.11.1"
+firebaseBom = "32.8.1"
 daggerHilt = "2.44"
 hiltNavigationCompose = "1.2.0"
 navigationCompose = "2.7.7"
@@ -45,6 +46,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 mobilenativefoundation-store = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "storeVersion" }
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 jetbrains-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines"}
