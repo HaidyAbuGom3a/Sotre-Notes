@@ -1,9 +1,11 @@
-package org.haidy.storenotes.ui.screens.singup
+package org.haidy.storenotes.ui.screens.login
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,19 +33,22 @@ import org.haidy.storenotes.ui.composable.StoreNotesTextField
 import org.haidy.storenotes.ui.theme.Typography
 import org.haidy.storenotes.ui.theme.White
 
-@Composable
-fun SignUpScreen() {
-    val viewModel: SignUpViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
-    val snackbarState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    SignUpContent(state, snackbarState, viewModel)
-}
-
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun SignUpContent(state: SignUpUiState, snackbarState: SnackbarHostState,listener: SignUpInteractionListener) {
+fun LoginScreen() {
+    val viewModel: LoginViewModel = hiltViewModel()
+    val state by viewModel.state.collectAsState()
     val snackBarState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    LoginContent(state, snackBarState, viewModel)
+}
+
+@Composable
+fun LoginContent(
+    state: LoginUiState,
+    snackBarState: SnackbarHostState,
+    listener: LoginInteractionListener
+) {
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackBarState) {
@@ -61,7 +67,7 @@ fun SignUpContent(state: SignUpUiState, snackbarState: SnackbarHostState,listene
         ) {
 
             Text(
-                text = "Sign Up",
+                text = "Login",
                 style = Typography.headlineLarge,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,13 +95,25 @@ fun SignUpContent(state: SignUpUiState, snackbarState: SnackbarHostState,listene
                 onTrailingIconClick = { listener.onClickEyeIcon() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                    .padding(start = 16.dp, end = 16.dp),
                 trailingPainter = painterResource(id = eyeIcon)
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = "Don't have an account?",
+                    style = Typography.bodyMedium.copy(color = Color.Blue),
+                    modifier = Modifier.clickable { listener.onClickDoNotHaveAccount() }
+                )
+            }
 
             StoreNotesButton(
-                onClick = { listener.onClickSignUp() },
-                text = "Sign Up",
+                onClick = { listener.onClickLogin() },
+                text = "Login",
                 modifier = Modifier.padding(horizontal = 16.dp),
                 isLoading = state.isLoading
             )

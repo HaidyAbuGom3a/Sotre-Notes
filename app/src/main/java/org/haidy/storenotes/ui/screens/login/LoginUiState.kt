@@ -1,6 +1,6 @@
-package org.haidy.storenotes.ui.screens.singup
+package org.haidy.storenotes.ui.screens.login
 
-data class SignUpUiState(
+data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val isPasswordVisible: Boolean = false,
