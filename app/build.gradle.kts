@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleDaggerHilt)
+    alias(libs.plugins.googleServices)
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
 }

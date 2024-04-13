@@ -59,6 +59,7 @@ google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compil
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinKapt = { id = "kotlin-kapt" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 googleKsp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 googleDaggerHilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 
