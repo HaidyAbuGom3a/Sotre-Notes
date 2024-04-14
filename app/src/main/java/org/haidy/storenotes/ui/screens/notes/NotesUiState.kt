@@ -8,5 +8,4 @@ data class NotesUiState(
     val notes: List<Note> = emptyList(),
     val newNoteContent: String = "",
     val isLoading: Boolean = false,
-    val store: MutableStore<NotesKey, Any>? = null
 )

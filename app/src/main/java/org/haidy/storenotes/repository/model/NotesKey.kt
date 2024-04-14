@@ -8,7 +8,7 @@ sealed class NotesKey {
 
     sealed class Write : NotesKey() {
         data object Create : Write()
-        data class UpdateById(val note: Note) : Write()
+        data object Update : Write()
     }
 
     sealed class Clear : NotesKey() {

@@ -37,7 +37,6 @@ class NotesRepository @Inject constructor(
     @OptIn(ExperimentalStoreApi::class)
     suspend fun getNoteStore(): MutableStore<NotesKey, Any> {
         val fetchedNotes = fetchGetAllNotes()
-        //key, network
         val fetcher: Fetcher<NotesKey, Any> = Fetcher.ofFlow { key: NotesKey ->
             require(key is NotesKey.Read)
             when (key) {
@@ -45,7 +44,6 @@ class NotesRepository @Inject constructor(
                 is NotesKey.Read.ReadAllNotes -> fetchedNotes
             }
         }
-        //local:
         val sourceOfTruth = getStoreSourceOfTruth()
         return StoreBuilder.from(
             fetcher = fetcher,
@@ -87,15 +85,13 @@ class NotesRepository @Inject constructor(
                 require(key is NotesKey.Read)
                 when (key) {
                     is NotesKey.Read.ReadAllNotes -> daoNotes.map { notes -> notes.map { it.toNote() } }
-                    is NotesKey.Read.ReadByNoteId -> flow {
-                        emit(notesDao.getNoteById(key.noteId).map { it.toNoteOrEmptyModel() })
-                    }
+                    is NotesKey.Read.ReadByNoteId -> notesDao.getNoteById(key.noteId).map { it.toNoteOrEmptyModel() }
                 }
             },
             writer = { key: NotesKey, value: Any ->
                 Log.i("HAIDDYY", "i am in writer, key is $key")
                 when (key) {
-                    is NotesKey.Write.UpdateById -> {
+                    is NotesKey.Write.Update -> {
                         value as Note
                         notesDao.updateNote(value.toEntity(getUserId()))
                     }
@@ -108,7 +104,10 @@ class NotesRepository @Inject constructor(
                     NotesKey.Read.ReadAllNotes -> {
                         Log.i("HAIDDYY", "value is $value")
                         value as List<Note>
-                        notesDao.updateNotes(value.map { note -> note.toEntity(getUserId()) }, userId)
+                        notesDao.updateNotes(
+                            value.map { note -> note.toEntity(getUserId()) },
+                            userId
+                        )
                     }
 
                     is NotesKey.Read.ReadByNoteId -> {
@@ -143,7 +142,7 @@ class NotesRepository @Inject constructor(
                         )
                     )
 
-                    is NotesKey.Write.UpdateById -> UpdaterResult.Success.Untyped(
+                    is NotesKey.Write.Update -> UpdaterResult.Success.Untyped(
                         notesDataSource.updateNote(
                             note
                         )

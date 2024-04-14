@@ -1,10 +1,6 @@
 package org.haidy.storenotes.ui.screens.notes
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.update
 import org.haidy.storenotes.repository.NotesRepository
 import org.haidy.storenotes.repository.model.Note
@@ -15,13 +11,14 @@ import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
-import org.mobilenativefoundation.store.store5.impl.extensions.get
 import javax.inject.Inject
 
 @OptIn(ExperimentalStoreApi::class)
 @HiltViewModel
 class NotesViewModel @Inject constructor(private val notesRepository: NotesRepository) :
     BaseViewModel<NotesUiState, NotesUiEffect>(NotesUiState()), NotesInteractionListener {
+
+    private var notesStore: MutableStore<NotesKey, Any>? = null
 
     init {
         getNotes()
@@ -38,14 +35,13 @@ class NotesViewModel @Inject constructor(private val notesRepository: NotesRepos
 
     @OptIn(ExperimentalStoreApi::class)
     private suspend fun onGetNotesStoreSuccess(store: MutableStore<NotesKey, Any>) {
-        _state.update { it.copy(store = store) }
+        notesStore = store
         val getNotesRequest =
             StoreReadRequest.fresh(NotesKey.Read.ReadAllNotes)
 
         store.stream<StoreReadResponse<List<Note>>>(getNotesRequest).collect { response ->
             when (response) {
                 is StoreReadResponse.Data -> {
-                    Log.e("HAIDDYY", "data: ${response.value}")
                     _state.update {
                         it.copy(
                             notes = response.value as List<Note>,
@@ -70,7 +66,6 @@ class NotesViewModel @Inject constructor(private val notesRepository: NotesRepos
     }
 
     private fun onError(error: Exception) {
-        Log.e("HAIDDYY", "onError: ${error.message}")
         _state.update { it.copy(isLoading = false) }
         sendNewEffect(NotesUiEffect.ShowErrorMessage(error.message ?: "Request failed"))
     }
@@ -80,15 +75,13 @@ class NotesViewModel @Inject constructor(private val notesRepository: NotesRepos
     }
 
     override fun onClickAddNote() {
-        val store = _state.value.store
-        if (store != null) {
+        if (notesStore != null) {
             val note = Note(id = "", content = _state.value.newNoteContent)
             val addNoteRequest =
                 StoreWriteRequest.of<NotesKey, Any, Any>(NotesKey.Write.Create, note)
             tryRequest(
-                block = { store.write(addNoteRequest) },
+                block = { notesStore!!.write(addNoteRequest) },
                 onSuccess = {
-                    Log.e("HAIDDYY", "success add note")
                     _state.update { it.copy(newNoteContent = "") }
                 },
                 onError = ::onError
@@ -97,12 +90,11 @@ class NotesViewModel @Inject constructor(private val notesRepository: NotesRepos
     }
 
     override fun onClickDeleteAllNotes() {
-        val store = _state.value.store
-        if (store != null) {
+        if (notesStore != null) {
             val deleteAllNotes =
                 StoreWriteRequest.of<NotesKey, Any, Any>(NotesKey.Clear.ClearAllNotes, Note("", ""))
             tryRequest(
-                block = { store.write(deleteAllNotes) },
+                block = { notesStore!!.write(deleteAllNotes) },
                 onSuccess = {},
                 onError = ::onError
             )
