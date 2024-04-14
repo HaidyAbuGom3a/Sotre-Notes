@@ -25,15 +25,19 @@ open class BaseViewModel<State, Effect>(state: State) : ViewModel() {
         }
     }
 
-    protected fun <Store> tryStore(
-        block: suspend () -> Store,
-        onSuccess: (Store) -> Unit,
+    protected fun <Response> tryStoreRequest(
+        block: suspend () -> Response,
+        onSuccess: suspend (Response) -> Unit,
         onError: (Exception) -> Unit
     ) {
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                val store = block()
-                onSuccess(store)
+                try {
+                    val response = block()
+                    onSuccess(response)
+                }catch (e: Exception){
+                    onError(e)
+                }
             }
         } catch (e: Exception) {
             onError(e)
