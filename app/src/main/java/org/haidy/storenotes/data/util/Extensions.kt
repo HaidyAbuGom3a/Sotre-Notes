@@ -17,8 +17,16 @@ fun NoteNetwork.toEntity(authorId: String): NoteEntity {
     return NoteEntity(id, authorId, content)
 }
 
+fun NoteNetwork.toNote(): Note {
+    return Note(id, content)
+}
+
 fun NoteEntity.toNote(): Note {
     return Note(id, content)
+}
+
+fun NoteEntity?.toNoteOrEmptyModel(): Note {
+    return this?.toNote() ?: Note("", "")
 }
 
 fun Note.toNetworkModel(): NoteNetwork {

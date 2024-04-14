@@ -28,9 +28,9 @@ object RepositoryModule {
     fun provideNoteRepository(
         notesDataSource: NotesDataSource,
         notesDao: NotesDao,
-        userId: String
+        storeNotesDataStore: StoreNotesDataStore
     ): NotesRepository {
-        return NotesRepository(notesDataSource, notesDao, userId)
+        return NotesRepository(notesDataSource, notesDao, storeNotesDataStore)
     }
 
     @Singleton
