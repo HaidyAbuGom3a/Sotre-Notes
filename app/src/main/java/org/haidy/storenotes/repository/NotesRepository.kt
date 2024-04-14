@@ -49,14 +49,14 @@ class NotesRepository @Inject constructor(
         val sourceOfTruth = getStoreSourceOfTruth()
         return StoreBuilder.from(
             fetcher = fetcher,
-           // sourceOfTruth = sourceOfTruth
+            sourceOfTruth = sourceOfTruth
         ).build().asMutableStore<NotesKey, Any, Any, Any, Any>(
             updater = getStoreUpdater(),
             bookkeeper = null
         )
     }
 
-    private suspend fun fetchGetNoteById(key: NotesKey): Note{
+    private suspend fun fetchGetNoteById(key: NotesKey): Note {
         require(key is NotesKey.Read.ReadByNoteId)
         val response = notesDataSource.getNote(key.noteId)
         return mapFetcherResultToNote(response)
@@ -67,6 +67,7 @@ class NotesRepository @Inject constructor(
             notesNetwork.notes.map { it.toNote() }
         }
     }
+
     private fun mapFetcherResultToNote(fetcherResult: FetcherResult<NoteNetwork>) =
         when (fetcherResult) {
             is FetcherResult.Data -> fetcherResult.value.toNote()
@@ -78,36 +79,47 @@ class NotesRepository @Inject constructor(
 
     private suspend fun getStoreSourceOfTruth(): SourceOfTruth<NotesKey, Any, Any> {
         val userId = getUserId()
+        val daoNotes = notesDao.getAllUserNotes(userId)
         return SourceOfTruth.Companion.of(
+
             reader = { key: NotesKey ->
-                //takes key and return output
-                Log.e("HAIDDYY", "i am in source of reader, key is $key")
+                Log.i("HAIDDYY", "i am in reader")
                 require(key is NotesKey.Read)
                 when (key) {
-                    //output: Flow<List<Note>>
-                    is NotesKey.Read.ReadAllNotes -> notesDao.getAllUserNotes(userId).map {
-                        it.map { noteEntity -> noteEntity.toNote() }
+                    is NotesKey.Read.ReadAllNotes -> daoNotes.map { notes -> notes.map { it.toNote() } }
+                    is NotesKey.Read.ReadByNoteId -> flow {
+                        emit(notesDao.getNoteById(key.noteId).map { it.toNoteOrEmptyModel() })
                     }
-                    //output: Note
-                    is NotesKey.Read.ReadByNoteId -> flow{ emit(notesDao.getNoteById(key.noteId).toNoteOrEmptyModel()) }
                 }
             },
             writer = { key: NotesKey, value: Any ->
-                Log.e("HAIDDYY", "i am in source of writer, key is $key")
-                require(key is NotesKey.Write)
-                (value as Note)
+                Log.i("HAIDDYY", "i am in writer, key is $key")
                 when (key) {
                     is NotesKey.Write.UpdateById -> {
-                        notesDao.updateNote(value.toEntity(userId))
+                        value as Note
+                        notesDao.updateNote(value.toEntity(getUserId()))
                     }
 
                     NotesKey.Write.Create -> {
-                        notesDao.addNote(value.toEntity(userId))
+                        value as Note
+                        notesDao.addNote(value.toEntity(getUserId()))
                     }
+
+                    NotesKey.Read.ReadAllNotes -> {
+                        Log.i("HAIDDYY", "value is $value")
+                        value as List<Note>
+                        notesDao.updateNotes(value.map { note -> note.toEntity(getUserId()) }, userId)
+                    }
+
+                    is NotesKey.Read.ReadByNoteId -> {
+                        value as Note
+                        notesDao.updateNote(value.toEntity(getUserId()))
+                    }
+
+                    else -> {}
                 }
             },
             delete = { key: NotesKey ->
-                Log.e("HAIDDYY", "i am in source of delete, key is $key")
                 require(key is NotesKey.Clear)
                 when (key) {
                     is NotesKey.Clear.ClearAllNotes -> notesDao.deleteAllUserNotes(userId)

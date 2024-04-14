@@ -17,7 +17,7 @@ interface NotesDao {
     suspend fun deleteNoteById(noteId: String)
 
     @Query("DELETE FROM NOTES_TABLE WHERE authorId = :authorId")
-    fun deleteAllUserNotes(authorId: String)
+    suspend fun deleteAllUserNotes(authorId: String)
 
     @Query("SELECT * FROM NOTES_TABLE WHERE authorId = :authorId")
     fun getAllUserNotes(authorId: String): Flow<List<NoteEntity>>
@@ -26,8 +26,14 @@ interface NotesDao {
     fun getNoteById(noteId: String): Flow<NoteEntity?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateNote(note: NoteEntity)
+    suspend fun updateNote(note: NoteEntity)
 
+    suspend fun updateNotes(notes: List<NoteEntity>, authorId: String) {
+        deleteAllUserNotes(authorId)
+        notes.forEach {
+            addNote(it)
+        }
+    }
 
 
 
