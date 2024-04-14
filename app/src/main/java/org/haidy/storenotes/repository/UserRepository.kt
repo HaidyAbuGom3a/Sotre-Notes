@@ -13,13 +13,4 @@ class UserRepository @Inject constructor(private val dataStore: StoreNotesDataSt
         return dataStore.getUserId()
     }
 
-    suspend fun saveIsLoggedIn(isLogged: Boolean) {
-        dataStore.saveIsLoggedIn(isLogged)
-    }
-
-    suspend fun getIsLoggedIn(): Boolean {
-        return dataStore.getIsLoggedIn()
-    }
-
-
 }

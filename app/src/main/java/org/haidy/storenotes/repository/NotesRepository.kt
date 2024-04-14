@@ -81,15 +81,14 @@ class NotesRepository @Inject constructor(
         return SourceOfTruth.Companion.of(
 
             reader = { key: NotesKey ->
-                Log.i("HAIDDYY", "i am in reader")
                 require(key is NotesKey.Read)
                 when (key) {
                     is NotesKey.Read.ReadAllNotes -> daoNotes.map { notes -> notes.map { it.toNote() } }
-                    is NotesKey.Read.ReadByNoteId -> notesDao.getNoteById(key.noteId).map { it.toNoteOrEmptyModel() }
+                    is NotesKey.Read.ReadByNoteId -> notesDao.getNoteById(key.noteId)
+                        .map { it.toNoteOrEmptyModel() }
                 }
             },
             writer = { key: NotesKey, value: Any ->
-                Log.i("HAIDDYY", "i am in writer, key is $key")
                 when (key) {
                     is NotesKey.Write.Update -> {
                         value as Note
@@ -102,7 +101,6 @@ class NotesRepository @Inject constructor(
                     }
 
                     NotesKey.Read.ReadAllNotes -> {
-                        Log.i("HAIDDYY", "value is $value")
                         value as List<Note>
                         notesDao.updateNotes(
                             value.map { note -> note.toEntity(getUserId()) },
@@ -162,8 +160,8 @@ class NotesRepository @Inject constructor(
                 }
             },
             onCompletion = OnUpdaterCompletion(
-                onSuccess = { Log.i("HAIDDYY", "Updating success") },
-                onFailure = { Log.i("HAIDDYY", "Updating failed") }
+                onSuccess = { Log.i("UPDATER_COMPLETION", "Updating success") },
+                onFailure = { Log.i("UPDATER_COMPLETION", "Updating failed") }
             )
         )
 

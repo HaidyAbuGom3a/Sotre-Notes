@@ -1,5 +1,6 @@
 package org.haidy.storenotes.ui.screens.note_details
 
+import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
 import org.haidy.storenotes.repository.NotesRepository
@@ -14,11 +15,15 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
 import javax.inject.Inject
 
 @HiltViewModel
-class NoteDetailsViewModel @Inject constructor(private val notesRepository: NotesRepository) :
+class NoteDetailsViewModel @Inject constructor(
+    private val notesRepository: NotesRepository,
+    savedStateHandle: SavedStateHandle
+) :
     BaseViewModel<NoteDetailsUiState, NoteDetailsUiEffect>(NoteDetailsUiState()),
     NoteDetailsInteractionListener {
 
     private var notesStore: MutableStore<NotesKey, Any>? = null
+    private val args = NoteDetailsArgs(savedStateHandle)
 
     init {
         getNoteDetails()
@@ -36,7 +41,7 @@ class NoteDetailsViewModel @Inject constructor(private val notesRepository: Note
     private suspend fun onGetStoreSuccess(store: MutableStore<NotesKey, Any>) {
         notesStore = store
         val getNotesRequest =
-            StoreReadRequest.cached(NotesKey.Read.ReadByNoteId("1713102927201"), true)
+            StoreReadRequest.cached(NotesKey.Read.ReadByNoteId(args.noteId), true)
 
         store.stream<StoreReadResponse<Note>>(getNotesRequest).collect { response ->
             when (response) {
@@ -79,7 +84,7 @@ class NoteDetailsViewModel @Inject constructor(private val notesRepository: Note
         if (notesStore != null) {
             val deleteNote =
                 StoreWriteRequest.of<NotesKey, Any, Any>(
-                    NotesKey.Clear.ById("1713102927201"),
+                    NotesKey.Clear.ById(args.noteId),
                     _state.value.toNote()
                 )
             tryRequest(

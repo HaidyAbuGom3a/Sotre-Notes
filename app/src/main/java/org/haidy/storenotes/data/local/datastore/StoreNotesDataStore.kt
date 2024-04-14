@@ -3,7 +3,6 @@ package org.haidy.storenotes.data.local.datastore
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -15,7 +14,6 @@ class StoreNotesDataStore @Inject constructor(context: Context) {
     companion object {
         private const val PREFERENCES_FILE_NAME = "store_notes"
         private val USER_ID = stringPreferencesKey("user_id")
-        private val IS_LOGGED = booleanPreferencesKey("is_logged")
     }
 
     private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -30,16 +28,6 @@ class StoreNotesDataStore @Inject constructor(context: Context) {
 
     suspend fun getUserId(): String {
         return prefDataStore.data.map { preferences -> preferences[USER_ID] }.first() ?: ""
-    }
-
-    suspend fun saveIsLoggedIn(isLogged: Boolean) {
-        prefDataStore.edit { preferences ->
-            preferences[IS_LOGGED] = isLogged
-        }
-    }
-
-    suspend fun getIsLoggedIn(): Boolean {
-        return prefDataStore.data.map { preferences -> preferences[IS_LOGGED] }.first() ?: false
     }
 
 

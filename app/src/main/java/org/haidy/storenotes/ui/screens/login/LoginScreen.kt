@@ -27,11 +27,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import org.haidy.storenotes.R
 import org.haidy.storenotes.ui.composable.StoreNotesButton
 import org.haidy.storenotes.ui.composable.StoreNotesTextField
+import org.haidy.storenotes.ui.screens.notes.navigateToNotes
+import org.haidy.storenotes.ui.screens.singup.navigateToSignUp
 import org.haidy.storenotes.ui.theme.Typography
 import org.haidy.storenotes.ui.theme.White
+import org.haidy.storenotes.ui.utils.EffectHandler
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -40,6 +44,25 @@ fun LoginScreen() {
     val state by viewModel.state.collectAsState()
     val snackBarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    EffectHandler(effects = viewModel.effect) { effect, navController ->
+        when (effect) {
+            LoginUiEffect.NavigateToNotesScreen -> navController.navigateToNotes(true)
+            LoginUiEffect.NavigateToSignUp -> navController.navigateToSignUp()
+            is LoginUiEffect.ShowErrorMessage -> {
+                scope.launch {
+                    snackBarState.showSnackbar(effect.message)
+                }
+            }
+
+            LoginUiEffect.ShowSuccessMessage -> {
+                scope.launch {
+                    snackBarState.showSnackbar("Login success")
+                }
+
+            }
+        }
+
+    }
     LoginContent(state, snackBarState, viewModel)
 }
 
