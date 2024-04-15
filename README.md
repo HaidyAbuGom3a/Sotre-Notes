@@ -1,6 +1,6 @@
 # Store-Notes
 
-StoreNotes is a powerful notes app designed for writing notes by utilizing a store library, it ensures seamless synchronization of data while providing an offline-first experience for users. With StoreNotes, you can manage your notes with ease, whether you're online or offline.
+StoreNotes is a powerful notes app designed for writing notes by utilizing [store](https://github.com/MobileNativeFoundation/Store) library, it ensures seamless synchronization of data while providing an offline-first experience for users. With StoreNotes, you can manage your notes with ease, whether you're online or offline.
 
 ## Features
 
